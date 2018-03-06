@@ -24,6 +24,7 @@
 		</div>
 		<div id="countdown"></div>
 		<div id="info"></div>
+		<audio id="music" src="./mp3/bg.mp3" preload="auto" controls loop="loop" style="display:none;"></audio>
 
 		<script src="./js/jquery-2.2.4.min.js"></script>
 		<script src="./js/three.js"></script>
@@ -38,7 +39,7 @@
 			var currentLevel; //当前奖项情况
 			var lotteryUsers = [];	//可抽奖员工列表
 			var luckyers = [];	//中奖人员列表
-			var total = 700; //员工总数
+			var total;
 
 			var copies = [];	//可抽人员副本
 			var isFirst = true;	//是否第一次抽
@@ -49,8 +50,8 @@
 			var isTimer = false;
 			var isStop = true;	//抽奖停止
 			var time = 3;
+			var isOver = false;
 			
-			var maxDis = 27000;	//最远距离
 			var camera, scene, renderer;
 			var controls;
 
@@ -68,7 +69,7 @@
 			var shapes = ['table', 'sphere', 'helix', 'grid'];
 
 
-			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, maxDis );
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 20000 );
 			scene = new THREE.Scene();
 
 
@@ -124,10 +125,10 @@
 				cols = 30;
 				rows = Math.ceil(lotteryUsers.length / cols);
 				
-				camera.position.set( 0, 0, 5000);
+				camera.position.set( 0, 0, 6000);
 
 				removeRow = parseInt(luckyers.length / 30);
-				posY = 1600 - removeRow * 50;
+				posY = 1000 - removeRow * 50;
 
 				// reset
 				index = 0;
@@ -175,7 +176,7 @@
 
 							var object = new THREE.Object3D();
 							object.position.x = ( j * 140 ) - 1800;
-							object.position.y = - ( i * 140 ) + posY;
+							object.position.y = - ( i * 140 ) + rows * 140 / 2;
 
 							targets.table.push( object );
 						}
@@ -229,8 +230,6 @@
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
 				this.zoomSpeed = 1;
 				this.panSpeed = 0.2;
-				controls.minDistance = 0;
-				controls.maxDistance = maxDis;
 				controls.addEventListener( 'change', render );
 
 				transform( targets.table, 2000 );
@@ -241,8 +240,6 @@
 				}, 2000);
 
 			}
-
-
 
 			//更新抽奖中奖信息
 			function renderLotteryInfo(){
@@ -273,6 +270,7 @@
 				
 				if(currentLevel != undefined){
 					if(currentLevel.label == 'levelTD' && currentLevel.surplus == 0){
+						isOver = true;
 						$('#info,#start,#stop').hide();
 					}else{
 						$('#info').html('接下来抽：'+currentLevel.text+'<br>剩余：'+currentLevel.surplus);
@@ -289,7 +287,6 @@
 					listHtml += '</ul>';
 				}
 				$('.list-box').html(listHtml);
-
 			}
 
 
@@ -321,6 +318,7 @@
 
 				if (isStop) {
 					isStop = false;
+					document.getElementById('music').play();
 					lotteryCount = currentLevel.n;
 
 					if(currentLevel.n > currentLevel.surplus){
@@ -340,33 +338,32 @@
 
 			function lotteryAni(){
 				var userLen = lotteryUsers.length;
-				var part1 = total - prizeLevel[0].count;
-				var part2 = total - prizeLevel[0].count - prizeLevel[1].count - prizeLevel[2].count - prizeLevel[3].count - prizeLevel[4].count - prizeLevel[5].count - prizeLevel[6].count;
 				var movement = 0;
 
-				if(userLen > part1){ //阳光奖形式
+				if(userLen > 400){ //阳光奖形式
 					var seed = 1;
-					var piece = parseInt((total - userLen) / 25);
+					var piece = parseInt(userLen / 25);
+					var m = userLen / 1400;
 					
 					transform(targets.grid, 2000);
-					camera.position.set( -100, 100, maxDis - 900 * piece); //900为grid下的两片之间的距离
+					camera.position.set( -100, 100, 1000 * piece); //1000为grid下的两片之间的距离
 
 					function run() {
 						if (movement < userLen) {
 							seed += 0.005;
-							controls.move(0.1, seed);
-							movement += 0.5;
+							controls.move(seed);
+							movement += m;
 						}else{
 							movement = 0;
 							seed = 1;
-							camera.position.set( -100, 100, maxDis - 900 * piece);
+							camera.position.set( -100, 100, 1000 * piece);
 						}
 						timeid_eff = setTimeout(run, 10);
 					}
 					timeid_eff = setTimeout(run, 10);
 
 					active();
-				}else if(userLen <= part1 && userLen > part2){ //5-10等奖形式
+				}else if(userLen <= 400 && userLen > 129){ //5-10等奖形式
 					var far = 4000;
 					transform(targets.helix, 2000);
 
@@ -382,16 +379,13 @@
 
 					active();
 				}else{ //剩余奖项形式
+					var far = 4000;
 					transform(targets.sphere, 1000);
+					camera.position.set( 0, 0, 3000);
 
 					function run() {
-						if (movement < 5000) {
-							far -= 0.01 * movement;
-							camera.position.set( 0.5 * movement, -0.5 * movement, 3000);
-							movement ++;
-						}else{
-							movement = 1;
-						}
+						movement = 0.002;
+						controls.rotateCamera2(new THREE.Vector2(movement,0));
 						timeid_eff = setTimeout(run, 20);
 					}
 					timeid_eff = setTimeout(run, 20);
@@ -442,6 +436,7 @@
 					param = [];
 
 				isStop = true;
+				document.getElementById('music').pause();
 
 				if(lotteryCount > 30){
 					$('#tip').addClass('wide');
@@ -572,6 +567,7 @@
 			$(document).keydown(function(e){
 			    if(!e) var e = window.event; 
 			    if(e.keyCode == 32){
+					if(isOver) return false;
 			        if(isStop){
 			        	start();
 			        }else{
