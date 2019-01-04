@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>交通事业部年会抽奖</title>
+		<title>HSBC</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="stylesheet" href="index.css">
@@ -58,10 +58,14 @@
 			var objects = [];
 			var targets = { table: [], sphere: [], helix: [], grid: [] };
 
+
+			// control from mouse
 			var btnStart = document.getElementById('start');
 			var btnStop = document.getElementById('stop');
 			var tip = document.getElementById('tip');
 			var btnLuckyers = document.getElementById('luckyers');
+
+
 			
 			var cols;
 			var rows;
@@ -89,13 +93,15 @@
 			}
 
 
-			for(var i = 0; i < 700; i++){
+			for(var i = 0; i < 500; i++){
+
 				lotteryUsers.push({
 					name: '张超',
 					jobNo: '00' + i,
 					lucky: '',
 					deptName: 'xxx',
-					dept4Name: 'xxxx'
+					dept4Name: 'xxxx',
+					img: './img/piggy.jpeg'
 				});
 			}
 
@@ -150,10 +156,11 @@
 							element.className = 'element';
 							element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
 
-							// var img = document.createElement('img');
-							// img.className = 'img';
+							var img = document.createElement('img');
+							img.className = 'img';
 							// img.src = imgs[Math.floor(9 * Math.random())];
-							// element.appendChild(img);
+							img.src = current['img'];
+							element.appendChild(img);
 
 							var username = document.createElement( 'div' );
 							username.className = 'name';
@@ -241,6 +248,29 @@
 
 			}
 
+
+            $("body").keydown(function(event) {
+
+                var keyCode = event.keyCode;   //keyCode就是获取到的键码
+
+                //之后就可以对每个按键自定义函数操作
+                switch (keyCode) {
+
+                    case 32:    //Space
+                        break;
+
+                    case 83:    //Stop
+                        break;
+
+                    case 76:    //Luckers
+                        break;
+
+                    default:
+                        break;
+                }
+            });
+
+
 			//更新抽奖中奖信息
 			function renderLotteryInfo(){
 				var group = _.groupBy(luckyers, 'lucky');
@@ -296,7 +326,7 @@
 					isTimer = false;
 					$('#tip2, #countdown').fadeOut();
 					lotteryAni();
-                    time = 3;
+                    time = 2;
                 } else {
 					isTimer = true;
 					$('#countdown').text(time);
@@ -317,6 +347,10 @@
 				var tip = '';
 
 				if (isStop) {
+
+                    // document.getElementById('happy').pause();
+
+
 					isStop = false;
 					document.getElementById('music').play();
 					lotteryCount = currentLevel.n;
@@ -437,6 +471,11 @@
 
 				isStop = true;
 				document.getElementById('music').pause();
+
+
+				// document.getElementById('happy').play();
+
+
 
 				if(lotteryCount > 30){
 					$('#tip').addClass('wide');
