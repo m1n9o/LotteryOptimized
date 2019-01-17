@@ -7,12 +7,20 @@
 		<link rel="stylesheet" href="index.css">
 	</head>
 	<body>
+		<!--<div class="fullscreen-bg">-->
+			<!--<video loop muted autoplay poster="img/bg2.jpg" class="fullscreen-bg__video">-->
+				<!--&lt;!&ndash;<source src="video/big_buck_bunny.webm" type="video/webm">&ndash;&gt;-->
+				<!--<source src="img/backg.mp4" type="video/mp4">-->
+				<!--&lt;!&ndash;<source src="video/big_buck_bunny.ogv" type="video/ogg">&ndash;&gt;-->
+			<!--</video>-->
+		<!--</div>-->
 		<div id="container"></div>
 		<div id="menu">
-			<!-- 抽奖个数：<input id="count" type="text" maxlength="3" value="1" /><br> -->
+			 抽奖个数：<input id="count" type="text" maxlength="3" value="1" /><br>
 			<button id="start">开始抽奖</button><br>
 			<button id="stop">停止抽奖</button><br>
-			<button id="luckyers">中奖名单</button>
+			<button id="luckyers">中奖名单</button><br>
+			<button id="clear">重置奖池</button>
 		</div>
 		<div id="list">
 			<div class="title">中奖名单</div>
@@ -34,6 +42,7 @@
 		<script src="./js/CSS3DRenderer.js"></script>
 		<script src="./js/lodash.js"></script>
 		<script src="./js/config.js"></script>
+		<!--<script src="./js/staff.js"></script>-->
 
 		<script>
 			var currentLevel; //当前奖项情况
@@ -49,7 +58,7 @@
 			var index = 0;
 			var isTimer = false;
 			var isStop = true;	//抽奖停止
-			var time = 3;
+			var time = 2;		//count down time
 			var isOver = false;
 			
 			var camera, scene, renderer;
@@ -64,6 +73,7 @@
 			var btnStop = document.getElementById('stop');
 			var tip = document.getElementById('tip');
 			var btnLuckyers = document.getElementById('luckyers');
+			var btnClear = document.getElementById('clear');
 
 
 			
@@ -93,17 +103,21 @@
 			}
 
 
-			for(var i = 0; i < 500; i++){
+			for(var i = 0; i < 530; i++){
 
 				lotteryUsers.push({
-					name: '张超',
+					name: 'trump',
 					jobNo: '00' + i,
 					lucky: '',
-					deptName: 'xxx',
-					dept4Name: 'xxxx',
+					deptName: 'RISK',
+					dept4Name: 'FCR',
 					img: './img/trump.png'
 				});
 			}
+
+			//load lottery User
+            // var  lotteryUsers = JSON.parse(staff.json);
+
 
 			init();
 
@@ -162,15 +176,15 @@
 							img.src = current['img'];
 							element.appendChild(img);
 
-							var username = document.createElement( 'div' );
-							username.className = 'name';
-							username.innerHTML = current['name'];
-							element.appendChild( username );
-
-							var jobno = document.createElement( 'div' );
-							jobno.className = 'jobno';
-							jobno.innerHTML = current['jobNo'];
-							element.appendChild( jobno );
+							// var username = document.createElement( 'div' );
+							// username.className = 'name';
+							// username.innerHTML = current['name'];
+							// element.appendChild( username );
+                            //
+							// var jobno = document.createElement( 'div' );
+							// jobno.className = 'jobno';
+							// jobno.innerHTML = current['jobNo'];
+							// element.appendChild( jobno );
 
 							var object = new THREE.CSS3DObject( element );
 							object.position.x = Math.random() * 4000 - 2000;
@@ -186,6 +200,7 @@
 							object.position.y = - ( i * 140 ) + rows * 140 / 2;
 
 							targets.table.push( object );
+
 						}
 					}
 				}
@@ -229,6 +244,10 @@
 					targets.grid.push( object );
 				}
 
+				//character
+
+
+
 				renderer = new THREE.CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.domElement.style.position = 'absolute';
@@ -249,26 +268,26 @@
 			}
 
 
-            $("body").keydown(function(event) {
-
-                var keyCode = event.keyCode;   //keyCode就是获取到的键码
-
-                //之后就可以对每个按键自定义函数操作
-                switch (keyCode) {
-
-                    case 32:    //Space
-                        break;
-
-                    case 83:    //Stop
-                        break;
-
-                    case 76:    //Luckers
-                        break;
-
-                    default:
-                        break;
-                }
-            });
+            // $("body").keydown(function(event) {
+            //
+            //     var keyCode = event.keyCode;   //keyCode就是获取到的键码
+            //
+            //     //之后就可以对每个按键自定义函数操作
+            //     switch (keyCode) {
+            //
+            //         case 32:    //Space
+            //             break;
+            //
+            //         case 83:    //Stop
+            //             break;
+            //
+            //         case 76:    //Luckers
+            //             break;
+            //
+            //         default:
+            //             break;
+            //     }
+            // });
 
 
 			//更新抽奖中奖信息
@@ -326,6 +345,7 @@
 					isTimer = false;
 					$('#tip2, #countdown').fadeOut();
 					lotteryAni();
+					//count down time
                     time = 2;
                 } else {
 					isTimer = true;
@@ -370,53 +390,17 @@
 				}
 			}
 
-			function lotteryAni(){
+
+            function lotteryAni() {
 				var userLen = lotteryUsers.length;
 				var movement = 0;
 
-				if(userLen > 400){ //阳光奖形式
-					var seed = 1;
-					var piece = parseInt(userLen / 25);
-					var m = userLen / 1400;
-					
-					transform(targets.grid, 2000);
-					camera.position.set( -100, 100, 1000 * piece); //1000为grid下的两片之间的距离
+				console.log(currentLevel);
 
-					function run() {
-						if (movement < userLen) {
-							seed += 0.005;
-							controls.move(seed);
-							movement += m;
-						}else{
-							movement = 0;
-							seed = 1;
-							camera.position.set( -100, 100, 1000 * piece);
-						}
-						timeid_eff = setTimeout(run, 10);
-					}
-					timeid_eff = setTimeout(run, 10);
-
-					active();
-				}else if(userLen <= 400 && userLen > 129){ //5-10等奖形式
-					var far = 4000;
-					transform(targets.helix, 2000);
-
-					function run() {
-						if (movement < 1000) {
-							camera.position.set( 0, 2 * movement, far);
-							far-= 2;
-							movement++;
-						}
-						timeid_eff = setTimeout(run, 10);
-					}
-					timeid_eff = setTimeout(run, 10);
-
-					active();
-				}else{ //剩余奖项形式
+				if(userLen && currentLevel.label!='level1'){
 					var far = 4000;
 					transform(targets.sphere, 1000);
 					camera.position.set( 0, 0, 3000);
-
 					function run() {
 						movement = 0.002;
 						controls.rotateCamera2(new THREE.Vector2(movement,0));
@@ -425,8 +409,90 @@
 					timeid_eff = setTimeout(run, 20);
 
 					active2();
-				}
-			}
+
+				}else{
+                    var seed = 1;
+                    var piece = parseInt(userLen / 25);
+                    var m = userLen / 1400;
+                    transform(targets.grid, 2000);
+                    camera.position.set( -100, 100, 1000 * piece); //1000为grid下的两片之间的距离
+
+                    function run() {
+                        if (movement < userLen) {
+                            seed += 0.005;
+                            controls.move(seed);
+                            movement += m;
+                        }else{
+                            movement = 0;
+                            seed = 1;
+                            camera.position.set( -100, 100, 1000 * piece);
+                        }
+                        timeid_eff = setTimeout(run, 10);
+                    }
+                    timeid_eff = setTimeout(run, 10);
+
+                    active();
+                }
+
+            }
+
+			// function lotteryAni(){
+			// 	var userLen = lotteryUsers.length;
+			// 	var movement = 0;
+            //
+			// 	if(userLen > 400){ //阳光奖形式
+			// 		var seed = 1;
+			// 		var piece = parseInt(userLen / 25);
+			// 		var m = userLen / 1400;
+            //
+			// 		transform(targets.grid, 2000);
+			// 		camera.position.set( -100, 100, 1000 * piece); //1000为grid下的两片之间的距离
+            //
+			// 		function run() {
+			// 			if (movement < userLen) {
+			// 				seed += 0.005;
+			// 				controls.move(seed);
+			// 				movement += m;
+			// 			}else{
+			// 				movement = 0;
+			// 				seed = 1;
+			// 				camera.position.set( -100, 100, 1000 * piece);
+			// 			}
+			// 			timeid_eff = setTimeout(run, 10);
+			// 		}
+			// 		timeid_eff = setTimeout(run, 10);
+            //
+			// 		active();
+			// 	}else if(userLen <= 400 && userLen > 129){ //5-10等奖形式
+			// 		var far = 4000;
+			// 		transform(targets.helix, 2000);
+            //
+			// 		function run() {
+			// 			if (movement < 1000) {
+			// 				camera.position.set( 0, 2 * movement, far);
+			// 				far-= 2;
+			// 				movement++;
+			// 			}
+			// 			timeid_eff = setTimeout(run, 10);
+			// 		}
+			// 		timeid_eff = setTimeout(run, 10);
+            //
+			// 		active();
+			// 	}else{ //剩余奖项形式
+			// 		var far = 4000;
+			// 		transform(targets.sphere, 1000);
+			// 		camera.position.set( 0, 0, 3000);
+            //
+			// 		function run() {
+			// 			movement = 0.002;
+			// 			controls.rotateCamera2(new THREE.Vector2(movement,0));
+			// 			timeid_eff = setTimeout(run, 20);
+			// 		}
+			// 		timeid_eff = setTimeout(run, 20);
+            //
+			// 		active2();
+			// 	}
+			// }
 
 
 			function active() {
@@ -535,6 +601,11 @@
 				});
 			}
 
+			function clear() {
+				window.localStorage.clear();
+				location.reload(true);
+            }
+
 			function transform( targets, duration ) {
 				TWEEN.removeAll();
 
@@ -598,6 +669,12 @@
 			btnLuckyers.addEventListener( 'click', function ( event ) {
 				$('#list').fadeIn();
 			}, false );
+
+
+            btnClear.addEventListener('click', function (event) {
+				clear();
+            }, false);
+
 
 			$('#list').on('click', function ( event ) {
 				$(this).fadeOut();

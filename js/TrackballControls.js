@@ -19,7 +19,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.screen = { left: 0, top: 0, width: 0, height: 0 };
 	//旋转速度
-	this.rotateSpeed = 1.0;
+	this.rotateSpeed = 2.5;
 	//变焦速度
 	this.zoomSpeed = 1.2;
 	//平移速度
@@ -667,11 +667,11 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 	// this.domElement.addEventListener( 'mousedown', mousedown, false );
-	// this.domElement.addEventListener( 'wheel', mousewheel, false );
-
-	// this.domElement.addEventListener( 'touchstart', touchstart, false );
-	// this.domElement.addEventListener( 'touchend', touchend, false );
-	// this.domElement.addEventListener( 'touchmove', touchmove, false );
+	this.domElement.addEventListener( 'wheel', mousewheel, false );
+    //
+    this.domElement.addEventListener( 'touchstart', touchstart, false );
+    // this.domElement.addEventListener( 'touchend', touchend, false );
+    // this.domElement.addEventListener( 'touchmove', touchmove, false );
 
 	window.addEventListener( 'keydown', keydown, false );
 	window.addEventListener( 'keyup', keyup, false );
